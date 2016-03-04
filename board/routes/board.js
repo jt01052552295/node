@@ -101,4 +101,64 @@ router.post('/update',function(req,res,next)
     });
 });
 
+
+
+router.get('/write',function(req,res,next)
+{
+    res.render('write', {title: ' 글작성 '});
+});
+
+router.post('/write',function(req,res,next)
+{
+    var userid = req.body.userid;
+    var name = req.body.name;
+    var address = req.body.address;
+
+    pool.getConnection(function(err,connection)
+    {
+        var sql = "insert test set userid=?, name=?, address=? ";
+        connection.query(sql,[userid,name,address],function(err,result)
+        {
+            console.log(result);
+            if(err) console.error("글 작성 중 에러 발생 err : ",err);
+
+            if(result.affectedRows == 0)
+            {
+                res.send("<script>alert('뭔가 에러.');history.back();</script>");
+            }
+            else
+            {
+                res.redirect('/board');
+            }
+            connection.release();
+        });
+    });
+});
+
+
+router.post('/delete',function(req,res,next)
+{
+    var idx = req.body.idx;
+
+    pool.getConnection(function(err,connection)
+    {
+        var sql = "delete from test where idx=? ";
+        connection.query(sql,[idx],function(err,result)
+        {
+            console.log(result);
+            if(err) console.error("글 삭제 중 에러 발생 err : ",err);
+
+            if(result.affectedRows == 0)
+            {
+                res.send("<script>alert('잘못된 요청으로 인해 값이 변경되지 않았습니다.');history.back();</script>");
+            }
+            else
+            {
+                res.redirect('/board');
+            }
+            connection.release();
+        });
+    });
+});
+
 module.exports = router;

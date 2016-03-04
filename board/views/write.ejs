@@ -8,20 +8,19 @@
 <body>
 <h1><%= title %></h1>
 
-<form action="/board/update" method="post" onsubmit="return onWriteSubmit()">
+<form action="/board/write" method="post" onsubmit="return onWriteSubmit()">
     <table border="1">
-        <input type="text" name="idx" value="<%=row.idx%>"/>
         <tr>
-            <td>아이디</td>
-            <td><input type="text" name="userid" id="userid" value="<%=row.userid%>" required/></td>
+            <td>작성자</td>
+            <td><input type="text" name="userid" id="userid" required/></td>
         </tr>
         <tr>
             <td>작성자</td>
-            <td><input type="text" name="name" id="name" value="<%=row.name%>" required/></td>
+            <td><input type="text" name="name" id="name" required/></td>
         </tr>
         <tr>
             <td>주소</td>
-            <td><input type="text" name="address" id="address" value="<%=row.address%>" required/></td>
+            <td><input type="text" name="address" id="address" required/></td>
         </tr>
         <tr>
             <td colspan="2">
