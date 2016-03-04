@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="/javascripts/jquery-1.11.2.min.js"></script>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+</head>
+<body>
+<h1><%= title %></h1>
+
+<form action="/board/update" method="post" onsubmit="return onWriteSubmit()">
+    <table border="1">
+        <input type="text" name="idx" value="<%=row.idx%>"/>
+        <tr>
+            <td>작성자</td>
+            <td><input type="text" name="userid" id="userid" value="<%=row.userid%>" required/></td>
+        </tr>
+        <tr>
+            <td>작성자</td>
+            <td><input type="text" name="name" id="name" value="<%=row.name%>" required/></td>
+        </tr>
+        <tr>
+            <td>주소</td>
+            <td><input type="text" name="address" id="address" value="<%=row.address%>" required/></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button type="submit">글쓰기</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<script>
+    function onWriteSubmit()
+    {
+        if ( $("#userid").val().trim() == "" )
+        {
+            var message = "아이디를 입력해 주세요";
+            $("#userid").val("");
+            $("#userid").focus();
+            alert(message);
+            return false;
+        }
+        if ( $("#name").val().trim() == "" )
+        {
+            var message = "이름을 입력해 주세요";
+            $("#name").val("");
+            $("#name").focus();
+            alert(message);
+            return false;
+        }
+        if ( $("#address").val().trim() == "" )
+        {
+            var message = "주소를 입력해 주세요";
+            $("#address").val("");
+            $("#address").focus();
+            alert(message);
+            return false;
+        }
+
+    }
+</script>
+
+</body>
+</html>
