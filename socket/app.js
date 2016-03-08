@@ -31,6 +31,18 @@ var httpServer = http.createServer(app).listen(3030, function(req,res){
 });
 
 var io = require('socket.io').listen(httpServer);
+var socket_ids = [];
+var count = 0;
+
+function registerUser(socket, nickname){
+  socket.get('nickname', function(err, pre_nick){
+      if(pre_nick != undefined) delete socket_ids[pre_nick];
+      socket_ids[nickname] = socket.id;
+      socket.set('nickname', nickname, function(){
+        io.socket.emit('userlist', {user:Object.keys(socket_ids)});
+      });
+  });
+}
 
 io.sockets.on('connection',function(socket){
    socket.emit('toclient',{msg:'Welcome !'});
