@@ -34,25 +34,39 @@ var httpServer =http.createServer(app).listen(3030, function(req,res){
 var io = require('socket.io').listen(httpServer);
 
 var usernames = {}; 
+var rooms = ['room1', 'room2', 'room3'];
+
 io.sockets.on('connection',function(socket){
     socket.emit('toclient',{msg:'Welcome to My Server !'});
     
     socket.on('sendchat', function(data){
-      io.sockets.emit('updatechat', socket.username, data);
+      io.sockets.in(socket.room).emit('updatechat', socket.username, data);
     });
 
     socket.on('adduser', function(username){
       socket.username = username;
       usernames[username] = username;
-      socket.emit('updatechat', 'SERVER', 'You have connected');
-      socket.broadcast.emit('updatechat', 'SERVER', username + ' has connected');
-      io.sockets.emit('updateusers', usernames )
+      socket.join('room1');
+      socket.emit('updatechat', 'SERVER', 'You have connected to room1');
+      socket.broadcast.to('room1').emit('updatechat', 'SERVER', username + ' has connected');
+      io.sockets.emit('updateusers', usernames );
+    });
+
+    socket.on('switchRoom', function(newroom){
+      socket.leave(socket.room);
+      socket.join(newroom);
+      socket.emit('updatechat', 'SERVER', 'You have connected to '+newroom);
+      socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has left this room');
+      socket.room = newroom;
+      socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username + ' has joined this room');
+      socket.emit('updaterooms', rooms, newroom);
     });
 
     socket.on('disconnect', function(){
       delete usernames[socket.username];
       io.sockets.emit('updateusers', usernames);
       socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
+      socket.leave(socket.room);
     });
 
 });
