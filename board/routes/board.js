@@ -33,8 +33,7 @@ router.get('/list/:page', function(req,res,next){
     });
 });
 
-router.get('/read/:idx',function(req,res,next)
-{
+router.get('/read/:idx',function(req,res,next){
     var idx = req.params.idx;
 
     pool.getConnection(function(err,connection)
@@ -51,8 +50,7 @@ router.get('/read/:idx',function(req,res,next)
     });
 });
 
-router.get('/update',function(req,res,next)
-{
+router.get('/update',function(req,res,next){
     var idx = req.query.idx;
 
     pool.getConnection(function(err,connection)
@@ -71,8 +69,7 @@ router.get('/update',function(req,res,next)
 
 });
 
-router.post('/update',function(req,res,next)
-{
+router.post('/update',function(req,res,next){
     var idx = req.body.idx;
     var userid = req.body.userid;
     var name = req.body.name;

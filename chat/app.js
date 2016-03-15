@@ -45,11 +45,13 @@ io.sockets.on('connection',function(socket){
 
     socket.on('adduser', function(username){
       socket.username = username;
+      socket.room = 'room1';
       usernames[username] = username;
       socket.join('room1');
       socket.emit('updatechat', 'SERVER', 'You have connected to room1');
       socket.broadcast.to('room1').emit('updatechat', 'SERVER', username + ' has connected');
-      io.sockets.emit('updateusers', usernames );
+      io.sockets.emit('updaterooms', rooms, 'room1' );
+      io.sockets.emit('updateusers', usernames);
     });
 
     socket.on('switchRoom', function(newroom){
