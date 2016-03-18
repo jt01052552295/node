@@ -5,10 +5,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
+var mysql = require('mysql');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var db = require('./routes/db'); 
 
 var app = express();
 
@@ -24,22 +24,50 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', routes);
+app.use('/', routes);
 app.use('/users', users);
-app.use('/', db);
 
-var httpServer =http.createServer(app).listen(3030, function(req,res){
+
+var pool = mysql.createPool({
+  connectionLimit: 3,
+  host: 'localhost',
+  database: 'yc5',
+  user: 'root',
+  password: 'autoset'
+});
+
+pool.getConnection(function (err, connection) {
+  if (err) {
+    return console.log('DB CONNECTION error: ' + err);
+  } else {
+    return console.log('DB CONNECTION');
+  }
+});
+
+
+var httpServer = http.createServer(app).listen(3030, function(req,res){
   console.log('Socket IO server has been started');
 });
 // upgrade http server to socket.io server
 var io = require('socket.io').listen(httpServer);
 
 var usernames = {}; 
-var rooms = {};
+var rooms = ['room1', 'room2', 'room3'];
 
 io.sockets.on('connection',function(socket){
     socket.emit('toclient',{msg:'Welcome to My Server !'});
     
+    socket.on('getRoomList', function(){
+      console.log('방 리스트 불러오기:' + rooms)
+      io.sockets.emit('initRoomList', rooms);
+    });
+
+    socket.on('setUserName', function(){
+      socket.username = '';
+      usernames[username] = '';
+      console.log('유저이름 정하기:')
+
+    });
 
     socket.on('disconnect', function(){
       delete usernames[socket.username];

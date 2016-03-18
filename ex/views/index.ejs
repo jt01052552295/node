@@ -9,8 +9,33 @@
 </head>
 <body>
 
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+<script>
+  var socket = io.connect('http://localhost:3030');
+  socket.on('connect', function(){
+  	socket.emit('getRoomList');
+  	socket.emit('setUserName');
+  });
+
+  socket.on('initRoomList', function(rooms){
+  	$('#rooms').empty();
+  	$.each(rooms, function(key, value) {
+  		$('#rooms').append('<a href="#" class="list-group-item" onclick="joinRoom(\''+value+'\')"><span class="badge">14</span>' + value + '</a>');
+  	});
+  });
+
+
+</script>
+
+<div class="row">
+	<div class="col-md-6">
+		<div class="list-group" id="rooms">
+			불러오는중...
+			
+		</div>
+	</div>
+</div>
+
+
 
 </body>
 </html>
