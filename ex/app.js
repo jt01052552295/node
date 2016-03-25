@@ -57,16 +57,36 @@ var rooms = ['room1', 'room2', 'room3'];
 io.sockets.on('connection',function(socket){
     socket.emit('toclient',{msg:'Welcome to My Server !'});
     
-    socket.on('getRoomList', function(){
-      console.log('방 리스트 불러오기:' + rooms)
+    socket.on('setUserName', function(username){
+      socket.username = username;
+      usernames[username] = username;
+      var userlist = JSON.stringify(usernames);
+      var newArr = JSON.parse(userlist);
+      console.log(newArr);
+      for(var objVarName in newArr){
+        console.log(newArr[objVarName]);
+      }
+
+
+      io.sockets.emit('updateusers', usernames);
       io.sockets.emit('initRoomList', rooms);
     });
 
-    socket.on('setUserName', function(){
-      socket.username = '';
-      usernames[username] = '';
-      console.log('유저이름 정하기:')
+    socket.on('getRoomList', function(){
+      // socket.emit('initRoomList', rooms);
+    });
 
+    socket.on('joinRoom', function(newroom){
+      socket.leave(socket.room);
+      socket.join(newroom);
+      socket.room = newroom;
+      socket.emit('joinOk', newroom);
+    });
+
+
+    socket.on('message', function(data){
+      socket.emit('my message', socket.username, data);
+      socket.broadcast.to(socket.room).emit('other message', socket.username, data);
     });
 
     socket.on('disconnect', function(){

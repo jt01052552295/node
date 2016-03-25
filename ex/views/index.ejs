@@ -3,6 +3,7 @@
 <head>
 <title><%= title %></title>
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<link rel='stylesheet' href='/stylesheets/style.css' />
 <script src="/socket.io/socket.io.js"></script>
 <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
@@ -11,27 +12,134 @@
 
 <script>
   var socket = io.connect('http://localhost:3030');
-  socket.on('connect', function(){
-  	socket.emit('getRoomList');
-  	socket.emit('setUserName');
+  
+
+  socket.on('updateusers', function(data) {
+    $('#users').empty();
+    $.each(data, function(key, value) {
+      $('#users').append('<li class="list-group-item">' + key + '</li>');
+    });
+    // $('#login_section').css({'display':'none'});
+    // $('#user_section').css({'display':'block'});
   });
+
 
   socket.on('initRoomList', function(rooms){
   	$('#rooms').empty();
   	$.each(rooms, function(key, value) {
-  		$('#rooms').append('<a href="#" class="list-group-item" onclick="joinRoom(\''+value+'\')"><span class="badge">14</span>' + value + '</a>');
+  		$('#rooms').append('<a href="#" class="list-group-item" onclick="joinRoom(\''+value+'\')"><span class="badge">0</span>' + value + '</a>');
   	});
   });
+
+  socket.on('joinOk', function(current_room) {
+  	$('#room_name').html(current_room);
+  	// $('#chat_section').css({'display':'block'});
+  });
+
+  socket.on('my message', function (username, data) {
+    $('#messages').append($('<p class="talk me">').text(data));
+    $('#messages').scrollTop($('#messages').prop('scrollHeight'));
+  });
+
+  socket.on('other message', function (username, data) {
+    $('#messages').append($('<p class="talk other">').text(data));
+    $('#messages').scrollTop($('#messages').prop('scrollHeight'));
+  });
+
+
+
+function joinRoom(room){
+    socket.emit('joinRoom', room);
+}
+
+$(function(){
+	$('#conn').click( function() {
+	  var name = $('#inputName').val();
+	  if(!name){
+	  	alert('이름을 입력하셈');
+	  } else {
+	  	$('#inputName').val('');	
+	  	socket.emit('setUserName', name);
+	  }
+	});
+
+	$('#inputName').keypress(function(e){
+		if(e.which == 13) {
+			$('#conn').focus().click();
+		}
+	});
+
+	$("#input").keyup(function(e){
+        if(e.which==13){
+        	$('#btn').focus().click();
+        	$(this).focus();
+        }
+    });
+    
+    $("#btn").on('click', function(){
+        socket.emit('message', $("#input").val());
+        $("#input").val('');
+        $("#input").focus();
+    });
+});
 
 
 </script>
 
-<div class="row">
-	<div class="col-md-6">
-		<div class="list-group" id="rooms">
+
+<div class="row" id="login_section" style="display: block;">
+
+	<div class="form-group">
+		<label for="inputName" class="col-xs-2 control-label">Name</label>
+		<div class="col-xs-2">
+			<input type="text" class="form-control" id="inputName" placeholder="Input your name">
+		</div>
+	</div>
+	<button type="button" class="btn btn-primary" id="conn">Connect</button>
+
+</div>
+
+<div class="row" id="user_section" style="display: block;">
+	<div class="col-xs-6">
+		<ul class="list-group" id="users">
+			불러오는중...
+			
+		</ul>
+	</div>
+</div>
+
+<div class="row" id="room_section" style="display: block;">
+	<div class="col-xs-6">
+		<div class="list-group" id="rooms" >
 			불러오는중...
 			
 		</div>
+	</div>
+</div>
+
+<div class="row" id="chat_section" style="display: block;">
+	<div calss="col-xs-12"><h1 id='room_name'></h1></div>
+	<div class="col-xs-6">
+		<div class="background" id="chat">
+			<div class ="msgbox" id="messages">
+				<!-- <p class="talk me">asdfasdfasdfasdfasdf</p>
+				<p class="talk other">asdfasdfasdfasdfasdf</p>
+				<p class="talk me">asdfasdfasdfasdfasdf</p>
+				<p class="talk other">asdfasdfasdfasdfasdf</p>
+				<p class="talk me">asdfasdfasdfasdfasdf</p>
+				<p class="talk other">asdfasdfasdfasdfasdf</p>
+				<p class="talk me">asdfasdfasdfasdfasdf</p>
+				<p class="talk other">asdfasdfasdfasdfasdf</p> -->
+			</div>
+	        <input id="input" class="msg" type="text"/>
+	        <button id="btn" class="send" type="button">전송</button>
+	    </div>
+	</div>
+	<div class="col-xs-3">
+		<ul class="list-group" id="usersInRoom">
+			불러오는중...
+			
+		</ul>
 	</div>
 </div>
 
